@@ -6,7 +6,13 @@ include config.mk
 SRC = drw.c dmenu.c stest.c util.c
 OBJ = $(SRC:.c=.o)
 
-all: dmenu stest
+all: options dmenu stest
+
+options:
+	@echo dmenu build options:
+	@echo "CFLAGS   = $(CFLAGS)"
+	@echo "LDFLAGS  = $(LDFLAGS)"
+	@echo "CC       = $(CC)"
 
 .c.o:
 	$(CC) -c $(CFLAGS) $<
@@ -55,4 +61,4 @@ uninstall:
 		$(DESTDIR)$(MANPREFIX)/man1/dmenu.1\
 		$(DESTDIR)$(MANPREFIX)/man1/stest.1
 
-.PHONY: all clean dist install uninstall
+.PHONY: all options clean dist install uninstall
