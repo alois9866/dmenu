@@ -801,8 +801,8 @@ static void
 usage(void)
 {
 	die("usage: dmenu [-bfiv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
-	    "             [-h height] [-x xoffset] [-y yoffset] [-w width] [-bw border width]\n"
-	    "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid (blocked)]");
+	    "             [-x xoffset] [-y yoffset] [-width width] [-bw border width]\n"
+	    "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]");
 }
 
 int
@@ -836,7 +836,7 @@ main(int argc, char *argv[])
 			dmx = atoi(argv[++i]);
 		else if (!strcmp(argv[i], "-y"))   /* window y offset (from bottom up if -b) */
 			dmy = atoi(argv[++i]);
-		else if (!strcmp(argv[i], "-w"))   /* make dmenu this wide */
+		else if (!strcmp(argv[i], "-width"))   /* make dmenu this wide */
 			dmw = atoi(argv[++i]);
 		else if (!strcmp(argv[i], "-m"))
 			mon = atoi(argv[++i]);
@@ -852,8 +852,8 @@ main(int argc, char *argv[])
 			colors[SchemeSel][ColBg] = argv[++i];
 		else if (!strcmp(argv[i], "-sf"))  /* selected foreground color */
 			colors[SchemeSel][ColFg] = argv[++i];
-		/* else if (!strcmp(argv[i], "-w"))    embedding window id  */
-		/* 	embed = argv[++i]; */
+		else if (!strcmp(argv[i], "-w"))   /* embedding window id */
+			embed = argv[++i];
 		else if (!strcmp(argv[i], "-bw"))
 			border_width = atoi(argv[++i]); /* border width */
 		else
