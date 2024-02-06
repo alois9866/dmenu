@@ -68,7 +68,7 @@ static Visual *visual;
 static int depth;
 static Colormap cmap;
 
-#include "config.h"
+#include "config.def.h"
 
 static int (*fstrncmp)(const char *, const char *, size_t) = strncmp;
 static char *(*fstrstr)(const char *, const char *) = strstr;
