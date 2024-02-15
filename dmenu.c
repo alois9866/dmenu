@@ -46,6 +46,8 @@ static char *embed;
 static int bh, mw, mh;
 static int dmx = 0; /* put dmenu at this x offset */
 static int dmy = 0; /* put dmenu at this y offset (measured from the bottom if topbar is 0) */
+static int dmxp = 0; /* put dmenu at an x that is dmxp% of its window width */
+static int dmyp = 0; /* put dmenu at a y that is dmyp% of its window height */
 static unsigned int dmw = 0; /* make dmenu this wide */
 static int inputw = 0, promptw;
 static int lrpad; /* sum of left and right padding */
@@ -744,8 +746,23 @@ setup(void)
 				if (INTERSECT(x, y, 1, 1, info[i]) != 0)
 					break;
 
-		x = info[i].x_org + dmx;
-		y = info[i].y_org + (topbar ? dmy : info[i].height - mh - dmy);
+		if (dmxp) {
+			x = info[i].x_org + info[i].width * dmxp / 100;
+			dmw = info[i].width * (100 - 2 * dmxp) / 100;
+		} else {
+			x = info[i].x_org + dmx;
+			if (center) {
+				x = (dmx > 0 ? x : info[i].x_org + (info[i].width - mw) / 2);
+			}
+		}
+		if (dmyp) {
+			y = info[i].y_org + info[i].height * dmyp / 100;
+		} else {
+			y = info[i].y_org + (topbar ? dmy : info[i].height - mh - dmy);
+			if (center) {
+				y = (dmy > 0 ? y : info[i].y_org + (info[i].height - mh) / 2);
+			}
+		}
 		mw = (dmw>0 ? dmw : info[i].width);
 		XFree(info);
 	} else
@@ -754,8 +771,23 @@ setup(void)
 		if (!XGetWindowAttributes(dpy, parentwin, &wa))
 			die("could not get embedding window attributes: 0x%lx",
 			    parentwin);
-		x = dmx;
-		y = topbar ? dmy : wa.height - mh - dmy;
+		if (dmxp) {
+			x = wa.width * dmxp / 100;
+			dmw = wa.width * (100 - 2 * dmxp) / 100;
+		} else {
+			x = dmx;
+			if (center) {
+				x = (dmx > 0 ? x : (wa.width - mw) / 2);
+			}
+		}
+		if (dmyp) {
+			y = wa.height * dmyp / 100;
+		} else {
+			y = topbar ? dmy : wa.height - mh - dmy;
+			if (center) {
+				y = (dmy > 0 ? y : (wa.height - mh) / 2);
+			}
+		}
 		mw = (dmw>0 ? dmw : wa.width);
 	}
 	promptw = (prompt && *prompt) ? TEXTW(prompt) - lrpad / 4 : 0;
@@ -801,7 +833,8 @@ static void
 usage(void)
 {
 	die("usage: dmenu [-bfiv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
-	    "             [-x xoffset] [-y yoffset] [-width width] [-bw border width]\n"
+	    "             [-x xoffset or 1-49%] [-y yoffset or 1-49%]\n"
+	    "             [-width width] [-bw border width] [-center]\n"
 	    "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]");
 }
 
@@ -810,6 +843,7 @@ main(int argc, char *argv[])
 {
 	XWindowAttributes wa;
 	int i, fast = 0;
+	char *param;
 
 	for (i = 1; i < argc; i++)
 		/* these options take no arguments */
@@ -823,7 +857,9 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
 			fstrncmp = strncasecmp;
 			fstrstr = cistrstr;
-		} else if (i + 1 == argc)
+		} else if (!strcmp(argv[i], "-center"))
+			center = 1;
+		else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */
 		else if (!strcmp(argv[i], "-g")) {   /* number of columns in grid */
@@ -832,11 +868,23 @@ main(int argc, char *argv[])
 		} else if (!strcmp(argv[i], "-l")) {   /* number of lines in vertical list */
 			lines = atoi(argv[++i]);
 			if (columns == 0) columns = 1;
-		} else if (!strcmp(argv[i], "-x"))   /* window x offset */
-			dmx = atoi(argv[++i]);
-		else if (!strcmp(argv[i], "-y"))   /* window y offset (from bottom up if -b) */
-			dmy = atoi(argv[++i]);
-		else if (!strcmp(argv[i], "-width"))   /* make dmenu this wide */
+		} else if (!strcmp(argv[i], "-x")) {   /* window x offset */
+			param = argv[++i];
+			if (param[strlen(param)-1] == '%') {
+				param[strlen(param)-1] = '\0';
+				dmxp = atoi(param);
+			} else {
+				dmx = atoi(param);
+			}
+		} else if (!strcmp(argv[i], "-y")) {   /* window y offset (from bottom up if -b) */
+			param = argv[++i];
+			if (param[strlen(param)-1] == '%') {
+				param[strlen(param)-1] = '\0';
+				dmyp = atoi(param);
+			} else {
+				dmy = atoi(param);
+			}
+		} else if (!strcmp(argv[i], "-width"))   /* make dmenu this wide */
 			dmw = atoi(argv[++i]);
 		else if (!strcmp(argv[i], "-m"))
 			mon = atoi(argv[++i]);

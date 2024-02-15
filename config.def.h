@@ -1,8 +1,9 @@
 /* See LICENSE file for copyright and license details. */
 /* Default settings; can be overriden by command line. */
 
-static int topbar = 1;                     /* -b  option; if 0, dmenu appears at bottom     */
-static const unsigned int alpha = 248;     /* Amount of opacity. 0xff is opaque             */
+static int topbar = 1;                 /* -b option; if 0, dmenu appears at bottom     */
+static int center = 0;                 /* -center option; if 1, dmenu appears centered */
+static const unsigned int alpha = 248; /* Amount of opacity. 0xff is opaque            */
 /* -fn option overrides fonts[0]; default X11 font or font set */
 static const char *fonts[] = {
 	"ComicCode Nerd Font:size=12"
