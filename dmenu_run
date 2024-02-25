@@ -1,2 +1,2 @@
 #!/bin/sh
-dmenu_path | dmenu -l 10 -center -x '40%' "$@" | ${SHELL:-"/bin/zsh"} &
+dmenu_path | dmenu -i -l 10 -center -x '40%' "$@" | ${SHELL:-"/bin/zsh"} &
